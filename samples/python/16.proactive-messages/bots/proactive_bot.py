@@ -43,3 +43,27 @@ class ProactiveBot(ActivityHandler):
         self.conversation_references[
             conversation_reference.user.id
         ] = conversation_reference
+
+from flask import Flask, request, Response
+from botbuilder.core import BotFrameworkAdapter
+from botbuilder.schema import Activity
+
+# Create the Flask app
+app = Flask(__name__)
+
+# Create bot adapter
+adapter = BotFrameworkAdapter(app_id="MicrosoftAppId", app_password="MicrosoftAppPassword")
+
+# Define the /api/messages route to receive messages
+@app.route("/api/messages", methods=["POST"])
+def messages():
+    # Get the incoming activity (message) from the request
+    activity = Activity().deserialize(request.json)
+
+    # Process the activity and send a response
+    response = adapter.process_activity(activity, "", "", async_callback)
+    return Response(response, status=200)
+
+# Start the Flask server
+if __name__ == "__main__":
+    app.run(port=3978)
